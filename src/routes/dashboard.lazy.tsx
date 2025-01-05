@@ -9,7 +9,7 @@ import dashboardLegend from "/dashboardbg.png";
 import dashboardPlanet from "/dashboardplanet.png";
 import SkeletonComponent from "@/components/design-system/components/Skeleton";
 
-type Project = {
+type ProjectType = {
     project_id: string;
     user_id: string;
     title: string;
@@ -26,7 +26,7 @@ export const Route = createLazyFileRoute("/dashboard")({
 
 function RouteComponent() {
     const { user } = useAuthStore((state) => state);
-    const [projects, setProjects] = useState<Project[]>([]);
+    const [projects, setProjects] = useState<ProjectType[]>([]);
     const { setShapes } = useArtboardStore((state) => state);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -47,8 +47,8 @@ function RouteComponent() {
                 `${DOMAIN}/api/v0/projects/${user!.user_id}`
             );
 
-            const newProjects: Project[] = [];
-            projects.data.forEach((project: Project) => {
+            const newProjects: ProjectType[] = [];
+            projects.data.forEach((project: ProjectType) => {
                 newProjects.push(project);
             });
             console.log("In Dashboard: newProjects");
@@ -122,7 +122,7 @@ function RouteComponent() {
                     </h2>
                 )}
             <div className="px-5 flex flex-row flex-wrap gap-8">
-                {/* {!loading &&
+                {!loading &&
                     projects.map(
                         (project, index) =>
                             project.active && (
@@ -133,7 +133,7 @@ function RouteComponent() {
                                     key={index}
                                 />
                             )
-                    )} */}
+                    )}
             </div>
         </main>
     );

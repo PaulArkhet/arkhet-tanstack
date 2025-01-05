@@ -10,11 +10,11 @@ import iconStar from "/iconstar.png";
 import iconEllipsis from "/iconellipsis2.png";
 import imageDelete from "/imagedelete.png";
 import trashIcon from "/icontrash.png";
-import { NavLink } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import axios from "axios";
 import DOMAIN from "@/services/endpoint";
+import { Link } from "@tanstack/react-router";
 
 type Project = {
     project_id: string;
@@ -134,7 +134,7 @@ export default function Project(props: ProjectProps) {
                     onClick={() => setDeleteMode(false)}
                 ></div>
             )}
-            <NavLink
+            <Link
                 to={`/artboard/${props.project.project_id}`}
                 key={props.project.project_id}
             >
@@ -143,20 +143,20 @@ export default function Project(props: ProjectProps) {
                         props.index == 0
                             ? projectThumb
                             : props.index == 1
-                            ? projectThumb2
-                            : props.index == 2
-                            ? projectThumb3
-                            : props.index == 3
-                            ? projectThumb4
-                            : props.index == 4
-                            ? projectThumb5
-                            : props.index == 5
-                            ? projectThumb6
-                            : props.index == 6
-                            ? projectThumb7
-                            : props.index > 6
-                            ? projectThumb8
-                            : ""
+                              ? projectThumb2
+                              : props.index == 2
+                                ? projectThumb3
+                                : props.index == 3
+                                  ? projectThumb4
+                                  : props.index == 4
+                                    ? projectThumb5
+                                    : props.index == 5
+                                      ? projectThumb6
+                                      : props.index == 6
+                                        ? projectThumb7
+                                        : props.index > 6
+                                          ? projectThumb8
+                                          : ""
                     }
                     alt=""
                     className="w-full h-full object-cover"
@@ -180,7 +180,7 @@ export default function Project(props: ProjectProps) {
                         onClick={toggleMenu}
                     />
                 )}
-            </NavLink>
+            </Link>
             {showMenu && (
                 <div className="absolute right-5 top-10 bg-[#242424] border border-[#373541] rounded-xl py-5 px-5">
                     <div

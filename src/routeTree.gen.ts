@@ -13,11 +13,13 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ArtboardProjectIdImport } from './routes/artboard.$projectId'
 
 // Create Virtual Routes
 
 const SignupLazyImport = createFileRoute('/signup')()
 const DesignsystemLazyImport = createFileRoute('/designsystem')()
+const DatasetLazyImport = createFileRoute('/dataset')()
 const DashboardLazyImport = createFileRoute('/dashboard')()
 const IndexLazyImport = createFileRoute('/')()
 
@@ -35,6 +37,12 @@ const DesignsystemLazyRoute = DesignsystemLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/designsystem.lazy').then((d) => d.Route))
 
+const DatasetLazyRoute = DatasetLazyImport.update({
+  id: '/dataset',
+  path: '/dataset',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/dataset.lazy').then((d) => d.Route))
+
 const DashboardLazyRoute = DashboardLazyImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -46,6 +54,12 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const ArtboardProjectIdRoute = ArtboardProjectIdImport.update({
+  id: '/artboard/$projectId',
+  path: '/artboard/$projectId',
+  getParentRoute: () => rootRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -65,6 +79,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLazyImport
       parentRoute: typeof rootRoute
     }
+    '/dataset': {
+      id: '/dataset'
+      path: '/dataset'
+      fullPath: '/dataset'
+      preLoaderRoute: typeof DatasetLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/designsystem': {
       id: '/designsystem'
       path: '/designsystem'
@@ -79,6 +100,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupLazyImport
       parentRoute: typeof rootRoute
     }
+    '/artboard/$projectId': {
+      id: '/artboard/$projectId'
+      path: '/artboard/$projectId'
+      fullPath: '/artboard/$projectId'
+      preLoaderRoute: typeof ArtboardProjectIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -87,46 +115,75 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/dashboard': typeof DashboardLazyRoute
+  '/dataset': typeof DatasetLazyRoute
   '/designsystem': typeof DesignsystemLazyRoute
   '/signup': typeof SignupLazyRoute
+  '/artboard/$projectId': typeof ArtboardProjectIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/dashboard': typeof DashboardLazyRoute
+  '/dataset': typeof DatasetLazyRoute
   '/designsystem': typeof DesignsystemLazyRoute
   '/signup': typeof SignupLazyRoute
+  '/artboard/$projectId': typeof ArtboardProjectIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
   '/dashboard': typeof DashboardLazyRoute
+  '/dataset': typeof DatasetLazyRoute
   '/designsystem': typeof DesignsystemLazyRoute
   '/signup': typeof SignupLazyRoute
+  '/artboard/$projectId': typeof ArtboardProjectIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/designsystem' | '/signup'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/dataset'
+    | '/designsystem'
+    | '/signup'
+    | '/artboard/$projectId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/designsystem' | '/signup'
-  id: '__root__' | '/' | '/dashboard' | '/designsystem' | '/signup'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/dataset'
+    | '/designsystem'
+    | '/signup'
+    | '/artboard/$projectId'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/dataset'
+    | '/designsystem'
+    | '/signup'
+    | '/artboard/$projectId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   DashboardLazyRoute: typeof DashboardLazyRoute
+  DatasetLazyRoute: typeof DatasetLazyRoute
   DesignsystemLazyRoute: typeof DesignsystemLazyRoute
   SignupLazyRoute: typeof SignupLazyRoute
+  ArtboardProjectIdRoute: typeof ArtboardProjectIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   DashboardLazyRoute: DashboardLazyRoute,
+  DatasetLazyRoute: DatasetLazyRoute,
   DesignsystemLazyRoute: DesignsystemLazyRoute,
   SignupLazyRoute: SignupLazyRoute,
+  ArtboardProjectIdRoute: ArtboardProjectIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -141,8 +198,10 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/dashboard",
+        "/dataset",
         "/designsystem",
-        "/signup"
+        "/signup",
+        "/artboard/$projectId"
       ]
     },
     "/": {
@@ -151,11 +210,17 @@ export const routeTree = rootRoute
     "/dashboard": {
       "filePath": "dashboard.lazy.tsx"
     },
+    "/dataset": {
+      "filePath": "dataset.lazy.tsx"
+    },
     "/designsystem": {
       "filePath": "designsystem.lazy.tsx"
     },
     "/signup": {
       "filePath": "signup.lazy.tsx"
+    },
+    "/artboard/$projectId": {
+      "filePath": "artboard.$projectId.tsx"
     }
   }
 }
