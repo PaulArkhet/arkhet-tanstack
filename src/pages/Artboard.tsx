@@ -101,6 +101,47 @@ export async function updateWireframe(
     }
 }
 
+function ZoomBadge() {
+    const [show, setShow] = useState(false);
+    const [prevScale, setPrevScale] = useState(0);
+
+    const scale = useContext(ViewContext)?.scale;
+
+    useEffect(() => {
+        if (scale !== prevScale) {
+            setShow(true);
+            const timeout = setTimeout(() => {
+                setShow(false);
+                scale && setPrevScale(scale);
+            }, 3000);
+            return () => clearTimeout(timeout);
+        }
+    }, [scale, show, prevScale]);
+
+    return (
+        scale && (
+            <div
+                className={twMerge(
+                    "absolute top-16 right-64 z-[999] bg-[#262626] rounded px-3 py-1 drop-shadow-lg transition-opacity ease-out",
+                    show ? "opacity-100" : "opacity-0"
+                )}
+            >
+                <p className="font-semibold">{(scale * 100).toFixed(0)}%</p>
+            </div>
+        )
+    );
+}
+
+//@ts-ignore
+export async function projectLoader({ params }) {
+    const res = await axios.get(
+        `${DOMAIN}/api/v0/projects/project/${params.project_id}`
+    );
+
+    console.log("Project data:", res.data[0]);
+    return res.data;
+}
+
 export default function Artboard() {
     const {
         shapes,
@@ -366,45 +407,4 @@ export default function Artboard() {
             <RightNav pageContent={pageContent} />
         </main>
     );
-}
-
-function ZoomBadge() {
-    const [show, setShow] = useState(false);
-    const [prevScale, setPrevScale] = useState(0);
-
-    const scale = useContext(ViewContext)?.scale;
-
-    useEffect(() => {
-        if (scale !== prevScale) {
-            setShow(true);
-            const timeout = setTimeout(() => {
-                setShow(false);
-                scale && setPrevScale(scale);
-            }, 3000);
-            return () => clearTimeout(timeout);
-        }
-    }, [scale, show, prevScale]);
-
-    return (
-        scale && (
-            <div
-                className={twMerge(
-                    "absolute top-16 right-64 z-[999] bg-[#262626] rounded px-3 py-1 drop-shadow-lg transition-opacity ease-out",
-                    show ? "opacity-100" : "opacity-0"
-                )}
-            >
-                <p className="font-semibold">{(scale * 100).toFixed(0)}%</p>
-            </div>
-        )
-    );
-}
-
-//@ts-ignore
-export async function projectLoader({ params }) {
-    const res = await axios.get(
-        `${DOMAIN}/api/v0/projects/project/${params.project_id}`
-    );
-
-    console.log("Project data:", res.data[0]);
-    return res.data;
 }
