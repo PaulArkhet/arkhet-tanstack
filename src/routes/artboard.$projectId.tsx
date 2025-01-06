@@ -13,6 +13,7 @@ import { centeredScreenshots } from "@/utils/fakeDB";
 import { twMerge } from "tailwind-merge";
 import axios from "axios";
 import DOMAIN from "@/services/endpoint";
+import { updateWireframe } from "@/pages/Artboard";
 
 export type Bounds = ReturnType<typeof getBoundsForShape>;
 export type PageNavigation = "Interaction" | "Gen UI";
@@ -118,18 +119,6 @@ function RouteComponent() {
         setShapes,
     } = useArtboardStore((state) => state);
     const { setProject } = useProjectStore((state) => state);
-
-    async function loadData() {
-        try {
-            const { projectId } = Route.useParams();
-            await axios.get(`${DOMAIN}/api/v0/projects/${projectId}`);
-            console.log("fetching");
-        } catch (err) {
-            console.log(err);
-        }
-    }
-    const data = loadData();
-
     const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(
         null
     );
@@ -146,6 +135,141 @@ function RouteComponent() {
     //Changing the page content: Gen UI
     const [pageContent, setPageContent] =
         useState<PageNavigation>("Interaction");
+
+    const [data, setData] = useState(null);
+
+    useEffect(() => {
+        async function loadData() {
+            try {
+                const { projectId } = Route.useParams();
+                const res = await axios.get(
+                    `${DOMAIN}/api/v0/projects/${projectId}`
+                );
+                console.log("fetching");
+                console.log(projectId);
+                setData(res.data);
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        loadData();
+    }, []);
+
+    useEffect(() => {
+        const debounceTimeout = setTimeout(() => {
+            if (shapes.length === 0) return;
+            updateWireframe(data, shapes);
+        }, 2000);
+
+        return () => clearTimeout(debounceTimeout);
+    }, [shapes]);
+
+    // useEffect(() => {
+    //     setProject(data);
+    //     //@ts-ignore
+    //     setShapes(JSON.parse(data[0].wireframe));
+    // }, [data, setProject, setShapes]);
+
+    useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            const target = event.target as HTMLElement;
+            if (
+                target.tagName === "INPUT" ||
+                target.tagName === "TEXTAREA" ||
+                target.isContentEditable
+            ) {
+                return;
+            }
+
+            if (
+                (event.key === "Delete" || event.key === "Backspace") &&
+                selectedShapeId !== null
+            ) {
+                handleDeleteShape(selectedShapeId);
+            }
+
+            if (event.ctrlKey && event.key === "z") {
+                handleTimeTravel("undo");
+            }
+
+            if (event.ctrlKey && event.key === "y") {
+                handleTimeTravel("redo");
+            }
+
+            /*
+            if (event.ctrlKey && event.key === "=") {
+                event.preventDefault();
+                setScale((prevScale) => Math.min(prevScale + 0.1, 3)); // Limit maximum zoom to 3
+                console.log(scale);
+            } else if (event.ctrlKey && event.key === "-") {
+                event.preventDefault();
+                setScale((prevScale) => Math.max(prevScale - 0.1, 0.1)); // Limit minimum zoom to 0.5
+                console.log(scale);
+            }
+            */
+
+            if (event.key === "h") {
+                toggleHandTool();
+            }
+            if (event.key === "v") {
+                setIsHandToolActive(false);
+            }
+            if (event.key === "r") {
+                handleAddShape("page", canvasRef, view!.scale);
+            }
+            if (event.key === "t") {
+                handleAddShape("text", canvasRef, view!.scale);
+            }
+            if (event.key === "b") {
+                handleAddShape("button", canvasRef, view!.scale);
+            }
+            if (event.key === "c") {
+                handleAddShape("circle", canvasRef, view!.scale);
+            }
+            if (event.key === "i") {
+                handleAddShape("inputField", canvasRef, view!.scale);
+            }
+            if (event.key === " ") {
+                event.preventDefault();
+                setIsHandToolActive(true);
+            }
+        }
+
+        function handleKeyUp(event: KeyboardEvent) {
+            if (event.key === " ") {
+                // Deactivate hand tool on spacebar release
+                setIsHandToolActive(false);
+            }
+        }
+
+        function handleWheel(event: WheelEvent) {
+            if (event.ctrlKey) {
+                event.preventDefault();
+            }
+        }
+
+        function handleMouseDown(event: MouseEvent) {
+            if (event.button === 1) {
+                // Middle mouse button (scroll wheel click)
+                event.preventDefault();
+                setIsHandToolActive(true); // Activate hand tool on scroll wheel press
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("keyup", handleKeyUp);
+        window.addEventListener("wheel", handleWheel, { passive: false });
+        window.addEventListener("mousedown", handleMouseDown);
+        // window.addEventListener("mouseup", handleMouseUp);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("keyup", handleKeyUp);
+            window.removeEventListener("wheel", handleWheel);
+            window.removeEventListener("mousedown", handleMouseDown);
+            // window.removeEventListener("mouseup", handleMouseUp);
+        };
+    }, [selectedShapeId, view]);
 
     function handleMouseMove(event: React.MouseEvent) {
         if (isHandToolActive && dragStart) {

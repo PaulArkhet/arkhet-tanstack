@@ -156,14 +156,10 @@ export default function Artboard() {
         setShapes,
     } = useArtboardStore((state) => state);
     const { setProject } = useProjectStore((state) => state);
-
     const data = useLoaderData();
-    // const [scale, setScale] = useState(1);
-
     const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(
         null
     );
-
     const [canvasPosition, setCanvasPosition] = useState({
         x: -1000,
         y: -1000,
@@ -182,28 +178,6 @@ export default function Artboard() {
         //@ts-ignore
         setShapes(JSON.parse(data[0].wireframe));
     }, [data, setProject, setShapes]);
-
-    function handleMouseDown(event: React.MouseEvent) {
-        if (isHandToolActive || event.button === 1) {
-            setDragStart({ x: event.clientX, y: event.clientY });
-        }
-    }
-
-    function handleMouseMove(event: React.MouseEvent) {
-        if (isHandToolActive && dragStart) {
-            const dx = event.clientX - dragStart.x;
-            const dy = event.clientY - dragStart.y;
-            setCanvasPosition((prevPosition) => ({
-                x: prevPosition.x + dx / 2,
-                y: prevPosition.y + dy / 2,
-            }));
-            setDragStart({ x: event.clientX, y: event.clientY });
-        }
-    }
-
-    function handleMouseUp() {
-        setDragStart(null);
-    }
 
     useEffect(() => {
         const debounceTimeout = setTimeout(() => {
@@ -314,6 +288,28 @@ export default function Artboard() {
             // window.removeEventListener("mouseup", handleMouseUp);
         };
     }, [selectedShapeId, view]);
+
+    function handleMouseDown(event: React.MouseEvent) {
+        if (isHandToolActive || event.button === 1) {
+            setDragStart({ x: event.clientX, y: event.clientY });
+        }
+    }
+
+    function handleMouseMove(event: React.MouseEvent) {
+        if (isHandToolActive && dragStart) {
+            const dx = event.clientX - dragStart.x;
+            const dy = event.clientY - dragStart.y;
+            setCanvasPosition((prevPosition) => ({
+                x: prevPosition.x + dx / 2,
+                y: prevPosition.y + dy / 2,
+            }));
+            setDragStart({ x: event.clientX, y: event.clientY });
+        }
+    }
+
+    function handleMouseUp() {
+        setDragStart(null);
+    }
 
     function handleCanvasClick(event: React.MouseEvent) {
         const currentTarget = event.currentTarget as HTMLElement;
