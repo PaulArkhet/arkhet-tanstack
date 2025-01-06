@@ -5,7 +5,6 @@ Version: 0.0.1
 Detail: LeftNav for Artboard
 */
 
-import { NavLink, useLoaderData } from "react-router-dom";
 import logo from "/Arkhet-logo_white 1.png";
 import caretDown from "/iconcaretdown.png";
 import caretRight from "/iconcaretright.png";
@@ -29,6 +28,7 @@ import DropdownComponent from "./leftnav/DropdownComponent";
 import ChatbotComponent from "./leftnav/ChatbotComponent";
 import NavigationComponent from "./leftnav/NavigationComponent";
 import trashIcon from "/icontrash.png";
+import { Link } from "@tanstack/react-router";
 
 // Fake data for prototype history
 const prototypeHistory = [
@@ -44,7 +44,7 @@ export default function LeftNav({
     pageContent: PageNavigation;
     canvasRef: MutableRefObject<HTMLDivElement | null>;
 }) {
-    const data = useLoaderData();
+    const data = null;
 
     const { shapes, selectedShapeId, setSelectedShapeId, moveLayer } =
         useArtboardStore((state) => state);
@@ -72,7 +72,7 @@ export default function LeftNav({
                     updateWireframe(data, shapes);
                 }}
             >
-                <NavLink to="/dashboard" className="flex">
+                <Link to="/dashboard" className="flex">
                     <img
                         src={logo}
                         alt="Arkhet Logo"
@@ -81,7 +81,7 @@ export default function LeftNav({
                     <p className="font pt-2 text-lg font-bold">
                         {(project && project[0]?.title) || "Undefined"}
                     </p>
-                </NavLink>
+                </Link>
             </div>
 
             {pageContent === "Interaction" && (
